@@ -1,4 +1,14 @@
+import os
 from typing import Any, Dict, Optional
+
+LANGUAGE = os.getenv('FACEFUSION_LANGUAGE', 'en')
+
+def _deep_update(base: Dict[str, Any], updates: Dict[str, Any]) -> None:
+        for key, value in updates.items():
+                if isinstance(value, dict) and key in base:
+                        _deep_update(base[key], value)
+                else:
+                        base[key] = value
 
 WORDING : Dict[str, Any] =\
 {
@@ -334,11 +344,15 @@ WORDING : Dict[str, Any] =\
 		'video_memory_strategy_dropdown': 'VIDEO MEMORY STRATEGY',
 		'webcam_fps_slider': 'WEBCAM FPS',
 		'webcam_image': 'WEBCAM',
-		'webcam_device_id_dropdown': 'WEBCAM DEVICE ID',
-		'webcam_mode_radio': 'WEBCAM MODE',
-		'webcam_resolution_dropdown': 'WEBCAM RESOLUTION'
-	}
+                'webcam_device_id_dropdown': 'WEBCAM DEVICE ID',
+                'webcam_mode_radio': 'WEBCAM MODE',
+                'webcam_resolution_dropdown': 'WEBCAM RESOLUTION'
+        }
 }
+
+if LANGUAGE == 'ja':
+        from facefusion.locales.ja import WORDING_JA
+        _deep_update(WORDING, WORDING_JA)
 
 
 def get(notation : str) -> Optional[str]:
