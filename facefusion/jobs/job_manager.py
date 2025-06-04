@@ -131,11 +131,14 @@ def remix_step(job_id : str, step_index : int, step_args : Args) -> bool:
 	if step_index and step_index < 0:
 		step_index = count_step_total(job_id) - 1
 
-	if has_step(job_id, step_index):
-		output_path = steps[step_index].get('args').get('output_path')
-		step_args['target_path'] = get_step_output_path(job_id, step_index, output_path)
-		return add_step(job_id, step_args)
-	return False
+        if has_step(job_id, step_index):
+                previous_args = steps[step_index].get('args')
+                output_path = previous_args.get('output_path')
+                target_path = previous_args.get('target_path')
+                source_paths = previous_args.get('source_paths') or previous_args.get('source_path')
+                step_args['target_path'] = get_step_output_path(job_id, step_index, output_path, target_path, source_paths)
+                return add_step(job_id, step_args)
+        return False
 
 
 def insert_step(job_id : str, step_index : int, step_args : Args) -> bool:

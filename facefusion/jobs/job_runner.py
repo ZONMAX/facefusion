@@ -55,9 +55,11 @@ def retry_jobs(process_step : ProcessStep, halt_on_error : bool) -> bool:
 def run_step(job_id : str, step_index : int, step : JobStep, process_step : ProcessStep) -> bool:
 	step_args = step.get('args')
 
-	if job_manager.set_step_status(job_id, step_index, 'started') and process_step(job_id, step_index, step_args):
-		output_path = step_args.get('output_path')
-		step_output_path = job_helper.get_step_output_path(job_id, step_index, output_path)
+        if job_manager.set_step_status(job_id, step_index, 'started') and process_step(job_id, step_index, step_args):
+                output_path = step_args.get('output_path')
+                target_path = step_args.get('target_path')
+                source_paths = step_args.get('source_paths') or step_args.get('source_path')
+                step_output_path = job_helper.get_step_output_path(job_id, step_index, output_path, target_path, source_paths)
 
 		return move_file(output_path, step_output_path) and job_manager.set_step_status(job_id, step_index, 'completed')
 	job_manager.set_step_status(job_id, step_index, 'failed')
@@ -106,7 +108,9 @@ def collect_output_set(job_id : str) -> JobOutputSet:
 	for index, step in enumerate(steps):
 		output_path = step.get('args').get('output_path')
 
-		if output_path:
-			step_output_path = job_manager.get_step_output_path(job_id, index, output_path)
-			job_output_set.setdefault(output_path, []).append(step_output_path)
-	return job_output_set
+                if output_path:
+                        target_path = step.get('args').get('target_path')
+                        source_paths = step.get('args').get('source_paths') or step.get('args').get('source_path')
+                        step_output_path = job_helper.get_step_output_path(job_id, index, output_path, target_path, source_paths)
+                        job_output_set.setdefault(output_path, []).append(step_output_path)
+        return job_output_set
