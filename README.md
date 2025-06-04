@@ -53,6 +53,10 @@ commands:
     job-retry-all                                 retry all failed jobs
 ```
 
+Language
+--------
+
+Set the environment variable `FACEFUSION_LANGUAGE` to `ja` to display the Web UI in Japanese.
 
 Documentation
 -------------
